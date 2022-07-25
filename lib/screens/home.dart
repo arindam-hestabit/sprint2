@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:rive/rive.dart';
 import 'package:sprint2/components/browser.dart';
+import 'package:sprint2/logic/get_logic.dart';
 import 'package:sprint2/standalones.dart';
 import 'package:sprint2/widget/glass_card.dart';
 import 'package:sprint2/widget/loading.dart';
@@ -159,6 +161,12 @@ class _HomeScreenState extends State<HomeScreen>
     List widgetList = <Widget>[
       listCard1("Update data  ", Icons.sync_rounded, () {
         setState(() {});
+
+        getLoader(context);
+        Future.delayed(
+          const Duration(seconds: 4),
+          () => Navigator.of(context).pop(),
+        );
       }),
       listCard1("Explore Hestabit  ", Icons.arrow_right_alt_rounded,
           browseHestabit, 30.0),

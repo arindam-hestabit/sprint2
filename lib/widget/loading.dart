@@ -9,9 +9,11 @@ void getLoader(BuildContext context) {
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,
+        insetPadding:
+            const EdgeInsets.symmetric(horizontal: 40.0, vertical: 100.0),
         child: RiveAnimation.asset(
           'assets/animations/safe_box_icon.riv',
-          fit: BoxFit.cover,
+          fit: BoxFit.fitHeight,
           stateMachines: const [
             'State Machine 1',
             'Idle',
