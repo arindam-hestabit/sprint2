@@ -1,7 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rive/rive.dart';
+import 'package:sprint2/components/browser.dart';
+import 'package:sprint2/standalones.dart';
 import 'package:sprint2/widget/glass_card.dart';
+import 'package:sprint2/widget/loading.dart';
 import 'package:sprint2/widget/my_carousel.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -15,8 +23,18 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController cardAnimationController;
   bool isSmall = false;
 
+  BrowseMe browseMe = BrowseMe();
+
   @override
   void initState() {
+    browseMe.addMenuItem(
+      ChromeSafariBrowserMenuItem(
+        id: 1,
+        label: "HestaBit",
+        action: (url, title) {},
+      ),
+    );
+
     cardAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -38,22 +56,6 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-
-    String getTime() {
-      var now = DateTime.now();
-
-      if (now.hour >= 4 && now.hour < 12) {
-        return "Morning";
-      } else if (now.hour >= 12 && now.hour < 17) {
-        return "Afternoon";
-      } else if (now.hour >= 17 && now.hour < 22) {
-        return "Evening";
-      } else if (now.hour >= 22 && now.hour < 4) {
-        return "Night";
-      } else {
-        return "Day";
-      }
-    }
 
     return Scaffold(
       body: AnimatedBuilder(
@@ -117,8 +119,53 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  GestureDetector listCard1(String label, IconData icon, void Function() func,
+      [double? iconSize]) {
+    return GestureDetector(
+      onTap: func,
+      child: GlassCard(
+        height: 50,
+        borderRadius: BorderRadius.circular(16.0),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                label,
+                textScaleFactor: 1.1,
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Flexible(
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: iconSize ?? 24.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   GlassCard homeGlassCard(Size screenSize, String Function() getTime) {
+    List widgetList = <Widget>[
+      listCard1("Update data  ", Icons.sync_rounded, () {
+        setState(() {});
+      }),
+      listCard1("Explore Hestabit  ", Icons.arrow_right_alt_rounded,
+          browseHestabit, 30.0),
+    ];
+
     return GlassCard(
+      clipBehavior: Clip.antiAlias,
       height: double.maxFinite,
       width: double.maxFinite,
       margin: const EdgeInsets.all(15.0),
@@ -127,6 +174,7 @@ class _HomeScreenState extends State<HomeScreen>
       child: (screenSize.height * 0.6 > screenSize.width)
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
                   onPressed: () => toggleCard(),
@@ -154,31 +202,21 @@ class _HomeScreenState extends State<HomeScreen>
                 Flexible(
                   child: MyCarousel(),
                 ),
-                /*SizedBox(
-                  height: 200,
-                  width: double.maxFinite,
-                  child: GestureDetector(
-                    //onTap: () => toggleCard(),
-                    child: RiveAnimation.asset(
-                      'assets/animations/switch_summer_demo.riv',
-                      stateMachines: const [
-                        'State Machine 1',
-                        'Off',
-                        'IdleOn',
-                        'On',
-                        'IdleOff',
-                      ],
-                      controllers: [a],
-                      onInit: (a) {
-                        /*toggleCard();
-                        Future.delayed(const Duration(seconds: 1), () {
-                          toggleCard();
-                        });*/
-                      },
-                      alignment: Alignment.topLeft,
+                Expanded(
+                  flex: 2,
+                  child: GlassCard(
+                    margin: const EdgeInsets.all(5.0),
+                    padding: const EdgeInsets.all(10.0),
+                    borderRadius: BorderRadius.circular(24.0),
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    child: ListView.separated(
+                      itemBuilder: (context, index) => widgetList[index],
+                      separatorBuilder: (context, i) =>
+                          const SizedBox(height: 8.0),
+                      itemCount: widgetList.length,
                     ),
                   ),
-                ),*/
+                ),
               ],
             )
           : Center(
@@ -191,6 +229,39 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ),
             ),
+    );
+  }
+
+  void browseHestabit() async {
+    Uri _url = Uri.parse("https://www.hestabit.com/");
+
+    // Fluttertoast.showToast(msg: "Opening HestaBit!");
+
+    getLoader(context);
+
+    Future.delayed(
+      const Duration(seconds: 2, milliseconds: 500),
+      () async {
+        Navigator.of(context).pop();
+
+        if (Platform.isAndroid || Platform.isIOS) {
+          browseMe.open(
+            url: _url,
+            options: ChromeSafariBrowserClassOptions(
+              android: AndroidChromeCustomTabsOptions(
+                shareState: CustomTabsShareState.SHARE_STATE_OFF,
+              ),
+              ios: IOSSafariOptions(
+                barCollapsingEnabled: true,
+              ),
+            ),
+          );
+        } else {
+          if (!await launchUrl(_url)) {
+            throw 'Could not launch $_url';
+          }
+        }
+      },
     );
   }
 
