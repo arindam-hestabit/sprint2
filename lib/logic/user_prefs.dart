@@ -29,5 +29,11 @@ class UserPreferences {
 
   Future<dynamic> removeData() async {
     final prefs = await SharedPreferences.getInstance();
+
+    prefs.remove('name');
+    prefs.remove('phone');
+    prefs.remove('email');
+    prefs.remove('dept');
+    prefs.remove('id');
   }
 }

@@ -2,16 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
 import 'package:rive/rive.dart';
 import 'package:sprint2/components/browser.dart';
-import 'package:sprint2/logic/get_logic.dart';
+import 'package:sprint2/logic/controllers/get_controller.dart';
+import 'package:sprint2/logic/user_prefs.dart';
+import 'package:sprint2/models/user_model.dart';
+import 'package:sprint2/screens/login.dart';
 import 'package:sprint2/standalones.dart';
 import 'package:sprint2/widget/glass_card.dart';
 import 'package:sprint2/widget/loading.dart';
 import 'package:sprint2/widget/my_carousel.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -26,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen>
   bool isSmall = false;
 
   BrowseMe browseMe = BrowseMe();
+  final UserPreferences _userPreferences = UserPreferences();
+  final UserController _userController = Get.find(tag: '_userController');
 
   @override
   void initState() {
@@ -53,6 +57,15 @@ class _HomeScreenState extends State<HomeScreen>
     cardAnimationController.isDismissed
         ? cardAnimationController.forward()
         : cardAnimationController.reverse();
+  }
+
+  logout() {
+    HestaBitUser prevUser = _userController.getUser.value!;
+
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginPage(prevUser: prevUser)));
+    _userPreferences.removeData();
+    _userController.resetUser();
   }
 
   @override
@@ -84,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen>
                         child: Padding(
                           padding: const EdgeInsets.only(top: 20.0),
                           child: Text(
-                            "Arindam Karmakar \n@ HestaBit",
+                            "${_userController.getUser.value!.name} \n@ HestaBit",
                             textScaleFactor: 2.8,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.6),
@@ -136,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
+              flex: 3,
               child: Text(
                 label,
                 textScaleFactor: 1.1,
@@ -168,8 +182,70 @@ class _HomeScreenState extends State<HomeScreen>
           () => Navigator.of(context).pop(),
         );
       }),
+      Row(
+        children: [
+          Expanded(
+            child: GlassCard(
+              height: 110,
+              borderRadius: BorderRadius.circular(16.0),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Flexible(
+                    child: Icon(
+                      Icons.account_circle_rounded,
+                      color: Colors.white,
+                      size: 36.0,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      "My Account",
+                      textScaleFactor: 1.3,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 10.0),
+          Expanded(
+            child: GlassCard(
+              height: 110,
+              borderRadius: BorderRadius.circular(16.0),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Flexible(
+                    child: Icon(
+                      Icons.people_rounded,
+                      color: Colors.white,
+                      size: 36.0,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      "My Friends",
+                      textScaleFactor: 1.3,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
       listCard1("Explore Hestabit  ", Icons.arrow_right_alt_rounded,
           browseHestabit, 30.0),
+      listCard1("Login with different data  ", Icons.logout_rounded, logout),
     ];
 
     return GlassCard(
@@ -179,21 +255,42 @@ class _HomeScreenState extends State<HomeScreen>
       margin: const EdgeInsets.all(15.0),
       padding: const EdgeInsets.all(2.0),
       borderRadius: BorderRadius.circular(30.0),
-      child: (screenSize.height * 0.6 > screenSize.width)
+      child: (screenSize.height * 0.5 > screenSize.width)
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  onPressed: () => toggleCard(),
-                  icon: Icon(
-                    (isSmall)
-                        ? Icons.north_west_rounded
-                        : Icons.south_east_rounded,
-                  ),
-                  color: Colors.white.withOpacity(0.6),
-                  //padding: EdgeInsets.zero,
-                  iconSize: 28.0,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () => toggleCard(),
+                      icon: Icon(
+                        (isSmall)
+                            ? Icons.north_west_rounded
+                            : Icons.south_east_rounded,
+                      ),
+                      color: Colors.white.withOpacity(0.6),
+                      //padding: EdgeInsets.zero,
+                      iconSize: 28.0,
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: GlassCard(
+                        height: 50.0,
+                        width: 50.0,
+                        margin: const EdgeInsets.all(5.0),
+                        padding: const EdgeInsets.all(10.0),
+                        borderRadius: BorderRadius.circular(50.0),
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        child: Icon(
+                          Icons.bubble_chart_rounded,
+                          color: Colors.white.withOpacity(0.5),
+                          size: 30.0,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
@@ -207,12 +304,10 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
                 ),
-                Flexible(
-                  child: MyCarousel(),
-                ),
+                MyCarousel(),
                 Expanded(
-                  flex: 2,
                   child: GlassCard(
+                    height: double.infinity,
                     margin: const EdgeInsets.all(5.0),
                     padding: const EdgeInsets.all(10.0),
                     borderRadius: BorderRadius.circular(24.0),

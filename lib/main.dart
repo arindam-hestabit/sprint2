@@ -2,12 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:sprint2/logic/controllers/get_controller.dart';
 import 'package:sprint2/logic/user_prefs.dart';
 import 'package:sprint2/models/user_model.dart';
 import 'package:sprint2/routes.dart';
 import 'package:sprint2/screens/first_landing.dart';
 import 'package:sprint2/screens/home.dart';
+import 'package:sprint2/screens/test.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,14 +30,16 @@ class Sprint2 extends StatefulWidget {
 }
 
 class _Sprint2State extends State<Sprint2> {
+  final UserPreferences _userPreferences = UserPreferences();
+  final UserController _userController =
+      Get.put(UserController(), tag: '_userController');
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-
-    var userPreferences = UserPreferences();
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -47,12 +52,15 @@ class _Sprint2State extends State<Sprint2> {
       // home: const LoginPage(),
       // home: Onboarding(),
       home: FutureBuilder<HestaBitUser>(
-        future: userPreferences.getData(),
+        future: _userPreferences.getData(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            _userController.setUser = snapshot.data!;
+
             return const HomeScreen();
           } else if (snapshot.hasError) {
             return const Onboarding();
+            // return const TestPage();
           } else {
             return const CircularProgressIndicator();
           }

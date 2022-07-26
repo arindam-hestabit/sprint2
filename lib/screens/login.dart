@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:sprint2/logic/controllers/get_controller.dart';
+import 'package:sprint2/logic/user_prefs.dart';
+import 'package:sprint2/models/user_model.dart';
+import 'package:sprint2/widget/loading.dart';
+import 'package:sprint2/widget/my_textfield.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final HestaBitUser? prevUser;
+
+  const LoginPage({
+    Key? key,
+    this.prevUser,
+  }) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -14,13 +25,75 @@ class _LoginPageState extends State<LoginPage> {
 
   int deptValue = 0;
 
+  List<String> deptsName = [
+    'Development',
+    'Human Resource',
+    'Management',
+    'IT',
+    'Finance',
+    'Operations',
+    'Business',
+    'Marketing',
+    'Designing',
+    'Food',
+  ];
+
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController mailController = TextEditingController();
   TextEditingController idController = TextEditingController();
 
   @override
+  void initState() {
+    if (widget.prevUser != null) setPrev(widget.prevUser!);
+
+    super.initState();
+  }
+
+  void setPrev(HestaBitUser u) {
+    setState(() {
+      nameController.text = u.name;
+      phoneController.text = u.phone;
+      mailController.text = u.email;
+      idController.text = u.id.toString();
+      deptValue = deptsName.indexOf(u.dept);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    List<Widget> inputFields = [
+      nameField(),
+      phoneField(),
+      emailField(),
+      idField(),
+    ]
+        .map((e) => Padding(padding: const EdgeInsets.all(8.0), child: e))
+        .toList();
+
+    List<Widget> formChildrens = [
+      Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: NeumorphicText(
+          "Let's \nget started",
+          textAlign: TextAlign.left,
+          style: const NeumorphicStyle(
+            color: Colors.black,
+            depth: 5.0,
+          ),
+          textStyle: NeumorphicTextStyle(
+            fontFamily: 'Fredoka_One',
+            fontSize: 36.0,
+          ),
+        ),
+      ),
+    ];
+    formChildrens.addAll(inputFields);
+    formChildrens.addAll([
+      deptField(),
+      Center(child: submitButton()),
+    ]);
+
     return Scaffold(
       backgroundColor: Colors.blueGrey.shade100,
       body: SafeArea(
@@ -37,28 +110,7 @@ class _LoginPageState extends State<LoginPage> {
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: NeumorphicText(
-                      "Let's \nget started",
-                      textAlign: TextAlign.left,
-                      style: const NeumorphicStyle(
-                        color: Colors.black,
-                        depth: 5.0,
-                      ),
-                      textStyle: NeumorphicTextStyle(
-                        fontFamily: 'Fredoka_One',
-                        fontSize: 36.0,
-                      ),
-                    ),
-                  ),
-                  nameField(),
-                  phoneField(),
-                  emailField(),
-                  idField(),
-                  deptField(),
-                ],
+                children: formChildrens,
               ),
             ),
           ),
@@ -67,20 +119,68 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget deptField() {
-    List<String> deptsName = [
-      'Development',
-      'Human Resource',
-      'Management',
-      'IT',
-      'Finance',
-      'Operations',
-      'Business',
-      'Marketing',
-      'Designing',
-      'Food',
-    ];
+  final UserPreferences _userPreferences = UserPreferences();
+  final UserController _userController = Get.find(tag: '_userController');
 
+  Widget submitButton() {
+    return NeumorphicButton(
+      onPressed: () async {
+        if (formKey.currentState!.validate()) {
+          HestaBitUser user = HestaBitUser(
+            name: nameController.text,
+            id: int.parse(idController.text),
+            phone: phoneController.text,
+            email: mailController.text,
+            dept: deptsName[deptValue],
+          );
+
+          _userPreferences.saveData(user);
+          _userController.setUser = user;
+
+          await Future.delayed(
+            const Duration(milliseconds: 550),
+            () => getLoader(context),
+          );
+
+          Future.delayed(
+            const Duration(seconds: 2, milliseconds: 500),
+            () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed('/home');
+            },
+          );
+        } else {
+          Fluttertoast.showToast(msg: "Please let me know you :)");
+        }
+      },
+      margin: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 15.0),
+      style: NeumorphicStyle(
+        color: Colors.blueGrey.shade100,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          Flexible(
+            child: Text(
+              "LogIn to \nAwesomeness",
+              textScaleFactor: 1.2,
+            ),
+          ),
+          SizedBox(width: 30.0),
+          Flexible(
+            child: ImageIcon(
+              AssetImage('assets/icons/Group 1(2).png'),
+              size: 50.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget deptField() {
     List<Widget> depts = [
       for (int i = 0; i < deptsName.length; i++)
         NeumorphicCheckbox(
@@ -114,46 +214,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Padding idField() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
+  MyTextField idField() => MyTextField(
         controller: idController,
-        decoration: InputDecoration(
-          prefixText: "HESTA - ",
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              width: 2.5,
-              color: Colors.blue.shade900,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              width: 2.5,
-              color: Colors.red,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              width: 2.5,
-              color: Colors.red,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              width: 2.5,
-              color: Colors.blue.shade700,
-            ),
-          ),
-          labelText: "ID",
-        ),
+        labelText: "ID",
         keyboardType: TextInputType.number,
-        enableInteractiveSelection: true,
-        maxLines: 1,
         validator: (value) {
           if (value == null || value.length != 4) {
             return "Enter valid id number";
@@ -161,49 +225,13 @@ class _LoginPageState extends State<LoginPage> {
             return null;
           }
         },
-      ),
-    );
-  }
+        prefixText: "HESTA - ",
+      );
 
-  Padding emailField() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
+  MyTextField emailField() => MyTextField(
         controller: mailController,
-        decoration: InputDecoration(
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              width: 2.5,
-              color: Colors.blue.shade900,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              width: 2.5,
-              color: Colors.red,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              width: 2.5,
-              color: Colors.red,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              width: 2.5,
-              color: Colors.blue.shade700,
-            ),
-          ),
-          labelText: "E-mail",
-        ),
+        labelText: "E-mail",
         keyboardType: TextInputType.emailAddress,
-        enableInteractiveSelection: true,
-        maxLines: 1,
         validator: (value) {
           if (!GetUtils.isEmail(value.toString())) {
             return "Enter valid E-mail id";
@@ -211,49 +239,12 @@ class _LoginPageState extends State<LoginPage> {
             return null;
           }
         },
-      ),
-    );
-  }
+      );
 
-  Padding phoneField() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
+  MyTextField phoneField() => MyTextField(
         controller: phoneController,
-        decoration: InputDecoration(
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              width: 2.5,
-              color: Colors.blue.shade900,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              width: 2.5,
-              color: Colors.red,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              width: 2.5,
-              color: Colors.red,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              width: 2.5,
-              color: Colors.blue.shade700,
-            ),
-          ),
-          labelText: "Phone",
-        ),
+        labelText: "Phone",
         keyboardType: TextInputType.phone,
-        enableInteractiveSelection: true,
-        maxLines: 1,
         validator: (value) {
           if (value == null || value.length != 10 || value.isEmpty) {
             return "Enter valid phone number";
@@ -261,49 +252,12 @@ class _LoginPageState extends State<LoginPage> {
             return null;
           }
         },
-      ),
-    );
-  }
+      );
 
-  Padding nameField() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
+  MyTextField nameField() => MyTextField(
         controller: nameController,
-        decoration: InputDecoration(
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              width: 2.5,
-              color: Colors.blue.shade900,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              width: 2.5,
-              color: Colors.red,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              width: 2.5,
-              color: Colors.red,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              width: 2.5,
-              color: Colors.blue.shade700,
-            ),
-          ),
-          labelText: "Name",
-        ),
+        labelText: "Name",
         keyboardType: TextInputType.name,
-        enableInteractiveSelection: true,
-        maxLines: 1,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return "Please enter your name";
@@ -311,7 +265,5 @@ class _LoginPageState extends State<LoginPage> {
             return null;
           }
         },
-      ),
-    );
-  }
+      );
 }

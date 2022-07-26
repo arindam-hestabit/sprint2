@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sprint2/screens/first_landing.dart';
 import 'package:sprint2/screens/home.dart';
 import 'package:sprint2/screens/login.dart';
 
@@ -16,6 +17,9 @@ class Routes {
 
       case '/login':
         return MaterialPageRoute(builder: (context) => const LoginPage());
+
+      case '/onboarding':
+        return MaterialPageRoute(builder: (context) => const Onboarding());
 
       default:
         return MaterialPageRoute(

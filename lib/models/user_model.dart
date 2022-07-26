@@ -11,3 +11,15 @@ class HestaBitUser {
     required this.dept,
   });
 }
+
+class HestaBitFriend {
+  String name, phone, email, dept;
+  String location = "Noida, India";
+
+  HestaBitFriend({
+    required this.name,
+    required this.phone,
+    required this.email,
+    required this.dept,
+  });
+}
