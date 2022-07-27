@@ -3,6 +3,7 @@ import 'package:rive/rive.dart';
 import 'package:sprint2/logic/controllers/get_controller.dart';
 import 'package:get/get.dart';
 import 'package:sprint2/widget/glass_card.dart';
+import 'package:sprint2/widget/hero_bot.dart';
 
 class MyAccount extends StatefulWidget {
   const MyAccount({Key? key}) : super(key: key);
@@ -166,7 +167,7 @@ class _MyAccountState extends State<MyAccount>
       margin: const EdgeInsets.all(15.0),
       padding: const EdgeInsets.all(2.0),
       borderRadius: BorderRadius.circular(30.0),
-      child: (screenSize.height * 0.5 > screenSize.width)
+      child: (screenSize.height * 0.7 > screenSize.width)
           ? Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -203,7 +204,7 @@ class _MyAccountState extends State<MyAccount>
                         ],
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () => getHeroBot(context),
                         child: GlassCard(
                           height: 50.0,
                           width: 50.0,
@@ -262,7 +263,7 @@ class _MyAccountState extends State<MyAccount>
             )
           : Center(
               child: Text(
-                "This view is not yet supported, please return to portrait view! \nArindam Karmaklar",
+                "This view is not yet supported, please return to portrait view! \nArindam Karmakar",
                 textScaleFactor: 1.3,
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -271,5 +272,12 @@ class _MyAccountState extends State<MyAccount>
               ),
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    cardAnimationController.dispose();
+    _userController.dispose();
+    super.dispose();
   }
 }

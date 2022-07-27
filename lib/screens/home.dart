@@ -10,6 +10,7 @@ import 'package:sprint2/models/user_model.dart';
 import 'package:sprint2/screens/login.dart';
 import 'package:sprint2/standalones.dart';
 import 'package:sprint2/widget/glass_card.dart';
+import 'package:sprint2/widget/hero_bot.dart';
 import 'package:sprint2/widget/loading.dart';
 import 'package:sprint2/widget/my_carousel.dart';
 import 'package:sprint2/widget/show_qr.dart';
@@ -284,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen>
       margin: const EdgeInsets.all(15.0),
       padding: const EdgeInsets.all(2.0),
       borderRadius: BorderRadius.circular(30.0),
-      child: (screenSize.height * 0.5 > screenSize.width)
+      child: (screenSize.height * 0.7 > screenSize.width)
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -304,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen>
                       iconSize: 28.0,
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => getHeroBot(context),
                       child: GlassCard(
                         height: 50.0,
                         width: 50.0,
@@ -353,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen>
             )
           : Center(
               child: Text(
-                "This view is not yet supported, please return to portrait view! \nArindam Karmaklar",
+                "This view is not yet supported, please return to portrait view! \nArindam Karmakar",
                 textScaleFactor: 1.3,
                 textAlign: TextAlign.center,
                 style: TextStyle(
