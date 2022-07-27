@@ -102,9 +102,10 @@ class MyCarousel extends StatelessWidget {
               ],
             );
           } else if (snapshot.hasError) {
-            return Text(
-              snapshot.error.toString(),
-              style: const TextStyle(color: Colors.red),
+            return const Text(
+              // snapshot.error.toString(),
+              "Unable to load data!",
+              style: TextStyle(color: Colors.red),
             );
           } else {
             return Align(
@@ -197,9 +198,10 @@ class MyCarousel extends StatelessWidget {
               ],
             );
           } else if (snapshot.hasError) {
-            return Text(
-              snapshot.error.toString(),
-              style: const TextStyle(color: Colors.red),
+            return const Text(
+              // snapshot.error.toString(),
+              "Unable to load data!",
+              style: TextStyle(color: Colors.red),
             );
           } else {
             return Align(

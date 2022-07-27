@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sprint2/screens/first_landing.dart';
+import 'package:sprint2/screens/friends.dart';
 import 'package:sprint2/screens/home.dart';
 import 'package:sprint2/screens/login.dart';
+import 'package:sprint2/screens/my_account.dart';
 
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -20,6 +22,12 @@ class Routes {
 
       case '/onboarding':
         return MaterialPageRoute(builder: (context) => const Onboarding());
+
+      case '/myaccount':
+        return MaterialPageRoute(builder: (context) => const MyAccount());
+
+      case '/myfriends':
+        return MaterialPageRoute(builder: (context) => const MyFriends());
 
       default:
         return MaterialPageRoute(

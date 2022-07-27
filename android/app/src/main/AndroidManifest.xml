@@ -2,7 +2,7 @@
     package="com.example.sprint2">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="sprint2"
+        android:label="Arindam's Sprint"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

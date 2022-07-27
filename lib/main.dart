@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:sprint2/firebase_options.dart';
 import 'package:sprint2/logic/controllers/get_controller.dart';
 import 'package:sprint2/logic/user_prefs.dart';
 import 'package:sprint2/models/user_model.dart';
@@ -14,6 +16,10 @@ import 'package:sprint2/screens/test.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
@@ -67,5 +73,11 @@ class _Sprint2State extends State<Sprint2> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _userController.dispose();
+    super.dispose();
   }
 }

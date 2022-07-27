@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "177035407378",
+    "project_id": "arindam-sprint",
+    "storage_bucket": "arindam-sprint.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177035407378:android:efd4aecf300fb03c4b68cb",
+        "android_client_info": {
+          "package_name": "com.example.sprint2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "177035407378-kblln9kqojg80iqgfmijn7u16ni38vnq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8cvfwOYsFRL0w0po-DNdEgpdjO4RpQec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "177035407378-kblln9kqojg80iqgfmijn7u16ni38vnq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

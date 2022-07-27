@@ -33,3 +33,28 @@ void getLoader(BuildContext context) {
 
   safeBox.dispose();
 }
+
+void getWaiter(BuildContext context) {
+  RiveAnimationController safeBox = SimpleAnimation('Animation 1');
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(0.0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 40.0),
+          child: RiveAnimation.asset(
+            'assets/animations/milkshake_bomb.riv',
+            fit: BoxFit.fitWidth,
+            stateMachines: const ['Animation 1'],
+            controllers: [safeBox],
+          ),
+        ),
+      );
+    },
+  );
+
+  safeBox.dispose();
+}

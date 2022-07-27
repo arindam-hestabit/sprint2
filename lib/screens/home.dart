@@ -12,6 +12,7 @@ import 'package:sprint2/standalones.dart';
 import 'package:sprint2/widget/glass_card.dart';
 import 'package:sprint2/widget/loading.dart';
 import 'package:sprint2/widget/my_carousel.dart';
+import 'package:sprint2/widget/show_qr.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 
@@ -134,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  GestureDetector listCard1(String label, IconData icon, void Function() func,
+  GestureDetector listCard1(String label, dynamic icon, void Function() func,
       [double? iconSize]) {
     return GestureDetector(
       onTap: func,
@@ -159,11 +160,13 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
             Flexible(
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: iconSize ?? 24.0,
-              ),
+              child: (icon is IconData)
+                  ? Icon(
+                      icon,
+                      color: Colors.white,
+                      size: iconSize ?? 24.0,
+                    )
+                  : icon,
             ),
           ],
         ),
@@ -185,59 +188,77 @@ class _HomeScreenState extends State<HomeScreen>
       Row(
         children: [
           Expanded(
-            child: GlassCard(
-              height: 110,
-              borderRadius: BorderRadius.circular(16.0),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Flexible(
-                    child: Icon(
-                      Icons.account_circle_rounded,
-                      color: Colors.white,
-                      size: 36.0,
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pushNamed('/myaccount'),
+              child: GlassCard(
+                height: 110,
+                borderRadius: BorderRadius.circular(16.0),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Flexible(
+                      child: Hero(
+                        tag: 'AccountIcon',
+                        child: Icon(
+                          Icons.account_circle_rounded,
+                          color: Colors.white,
+                          size: 36.0,
+                        ),
+                      ),
                     ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      "My Account",
-                      textScaleFactor: 1.3,
-                      style: TextStyle(color: Colors.white),
+                    Flexible(
+                      child: Hero(
+                        tag: 'AccountText',
+                        child: Text(
+                          "My Account",
+                          textScaleFactor: 1.3,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
           const SizedBox(width: 10.0),
           Expanded(
-            child: GlassCard(
-              height: 110,
-              borderRadius: BorderRadius.circular(16.0),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Flexible(
-                    child: Icon(
-                      Icons.people_rounded,
-                      color: Colors.white,
-                      size: 36.0,
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pushNamed('/myfriends'),
+              child: GlassCard(
+                height: 110,
+                borderRadius: BorderRadius.circular(16.0),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Flexible(
+                      child: Hero(
+                        tag: 'FriendIcon',
+                        child: Icon(
+                          Icons.people_rounded,
+                          color: Colors.white,
+                          size: 36.0,
+                        ),
+                      ),
                     ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      "My Friends",
-                      textScaleFactor: 1.3,
-                      style: TextStyle(color: Colors.white),
+                    Flexible(
+                      child: Hero(
+                        tag: 'FriendText',
+                        child: Text(
+                          "My Friends",
+                          textScaleFactor: 1.3,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -245,6 +266,14 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       listCard1("Explore Hestabit  ", Icons.arrow_right_alt_rounded,
           browseHestabit, 30.0),
+      listCard1(
+        "My QR identity  ",
+        const ImageIcon(
+          AssetImage('assets/icons/material-symbols_qr-code-rounded.png'),
+          color: Colors.white,
+        ),
+        () => showMyQR(context, _userController.getUser.value!),
+      ),
       listCard1("Login with different data  ", Icons.logout_rounded, logout),
     ];
 
