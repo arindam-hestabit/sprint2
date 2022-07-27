@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
 import 'package:sprint2/logic/controllers/get_controller.dart';
-import 'package:sprint2/logic/user_prefs.dart';
 import 'package:get/get.dart';
 import 'package:sprint2/widget/glass_card.dart';
 
@@ -18,7 +17,7 @@ class _MyAccountState extends State<MyAccount>
 
   bool isSmall = false;
 
-  final UserPreferences _userPreferences = UserPreferences();
+  // final UserPreferences _userPreferences = UserPreferences();
   final UserController _userController = Get.find(tag: '_userController');
 
   @override

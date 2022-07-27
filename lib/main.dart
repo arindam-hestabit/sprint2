@@ -12,7 +12,6 @@ import 'package:sprint2/models/user_model.dart';
 import 'package:sprint2/routes.dart';
 import 'package:sprint2/screens/first_landing.dart';
 import 'package:sprint2/screens/home.dart';
-import 'package:sprint2/screens/test.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

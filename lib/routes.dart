@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, prefer_typing_uninitialized_variables
+
 import 'package:flutter/material.dart';
 import 'package:sprint2/screens/first_landing.dart';
 import 'package:sprint2/screens/friends.dart';

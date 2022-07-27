@@ -1,4 +1,4 @@
-import 'dart:convert';
+// ignore_for_file: unused_local_variable
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sprint2/models/user_model.dart';
@@ -48,6 +48,18 @@ class MyFirestore {
 
     try {
       final resp = await friends.doc(id).delete();
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> toggleFavourite(String id, bool inp) async {
+    CollectionReference friends = firestore.collection('friends');
+
+    try {
+      final resp = await friends.doc(id).update({'isfav': inp});
 
       return true;
     } catch (e) {

@@ -365,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void browseHestabit() async {
-    Uri _url = Uri.parse("https://www.hestabit.com/");
+    Uri url = Uri.parse("https://www.hestabit.com/");
 
     // Fluttertoast.showToast(msg: "Opening HestaBit!");
 
@@ -378,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen>
 
         if (Platform.isAndroid || Platform.isIOS) {
           browseMe.open(
-            url: _url,
+            url: url,
             options: ChromeSafariBrowserClassOptions(
               android: AndroidChromeCustomTabsOptions(
                 shareState: CustomTabsShareState.SHARE_STATE_OFF,
@@ -389,8 +389,8 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           );
         } else {
-          if (!await launchUrl(_url)) {
-            throw 'Could not launch $_url';
+          if (!await launchUrl(url)) {
+            throw 'Could not launch $url';
           }
         }
       },

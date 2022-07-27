@@ -245,3 +245,17 @@ AnimatedBuilder(
           );
         },
       )
+
+
+
+
+      AnimationConfiguration.staggeredList(
+                              position: index,
+                              duration: const Duration(milliseconds: 375),
+                              child: const SlideAnimation(
+                                verticalOffset: 50.0,
+                                child: FadeInAnimation(
+                                  child: SizedBox(height: 10.0),
+                                ),
+                              ),
+                            )

@@ -1,18 +1,17 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rive/rive.dart';
 import 'package:sprint2/database/my_firestore.dart';
 import 'package:sprint2/logic/controllers/get_controller.dart';
-import 'package:sprint2/logic/user_prefs.dart';
 import 'package:get/get.dart';
 import 'package:sprint2/models/user_model.dart';
 import 'package:sprint2/widget/glass_card.dart';
 import 'package:sprint2/widget/loading.dart';
 import 'package:sprint2/widget/my_textfield.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:math' as math;
 
 class MyFriends extends StatefulWidget {
   const MyFriends({Key? key}) : super(key: key);
@@ -26,8 +25,9 @@ class _MyFriendsState extends State<MyFriends>
   late AnimationController cardAnimationController;
 
   bool isSmall = false;
+  bool bgTask = false;
 
-  final UserPreferences _userPreferences = UserPreferences();
+  // final UserPreferences _userPreferences = UserPreferences();
   final UserController _userController = Get.find(tag: '_userController');
 
   RiveAnimationController safeBox = SimpleAnimation('Animation 1');
@@ -127,6 +127,7 @@ class _MyFriendsState extends State<MyFriends>
                 }
 
                 List widgetsInScroll = [
+                  const SizedBox(height: 8.0),
                   nameField(nameController),
                   phoneField(phoneController),
                   emailField(mailController),
@@ -261,18 +262,36 @@ class _MyFriendsState extends State<MyFriends>
     }
 
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: FloatingActionButton(
-          onPressed: () => addFriendPage(),
-          backgroundColor: Colors.white.withOpacity(0.5),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-          child: const Icon(
-            Icons.add_reaction_rounded,
-            color: Colors.white,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          (bgTask)
+              ? SizedBox(
+                  height: 150,
+                  width: 150,
+                  child: RiveAnimation.asset(
+                    'assets/animations/milkshake_bomb.riv',
+                    fit: BoxFit.fitWidth,
+                    stateMachines: const ['Animation 1'],
+                    controllers: [safeBox],
+                  ),
+                )
+              : Container(),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: FloatingActionButton(
+              onPressed: () => addFriendPage(),
+              backgroundColor: Colors.white.withOpacity(0.5),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              child: const Icon(
+                Icons.add_reaction_rounded,
+                color: Colors.white,
+              ),
+            ),
           ),
-        ),
+        ],
       ),
       body: AnimatedBuilder(
         animation: cardAnimationController,
@@ -379,7 +398,7 @@ class _MyFriendsState extends State<MyFriends>
       future: _firestore.getFriends(),
       builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot) {
         if (snapshot.hasData) {
-          if (snapshot.data!.length == 0) {
+          if (snapshot.data!.isEmpty) {
             return Center(
               child: Text(
                 "I know you have friends, \nadd 'em up here ...",
@@ -397,19 +416,41 @@ class _MyFriendsState extends State<MyFriends>
                     motion: const DrawerMotion(),
                     children: [
                       SlidableAction(
-                        onPressed: (context) {},
+                        onPressed: (context) async {
+                          setState(() {
+                            bgTask = true;
+                          });
+
+                          var resp = await _firestore.toggleFavourite(
+                              snapshot.data![index]['id'],
+                              !(snapshot.data![index]['data'].isFav));
+
+                          setState(() {
+                            bgTask = false;
+                          });
+                        },
                         autoClose: true,
-                        label: "Favourite",
-                        icon: Icons.favorite_rounded,
+                        label: (snapshot.data![index]['data'].isFav)
+                            ? "UnFav"
+                            : "Favourite",
+                        icon: (snapshot.data![index]['data'].isFav)
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_outline_rounded,
                         borderRadius: BorderRadius.circular(15.0),
                         backgroundColor: Colors.lightGreen.shade200,
                       ),
                       SlidableAction(
                         onPressed: (context) async {
+                          setState(() {
+                            bgTask = true;
+                          });
+
                           final bool resp = await _firestore
                               .deleteFriend(snapshot.data![index]['id']);
 
-                          setState(() {});
+                          setState(() {
+                            bgTask = false;
+                          });
 
                           if (!resp) {
                             Fluttertoast.showToast(msg: "Sorry!");
@@ -436,13 +477,29 @@ class _MyFriendsState extends State<MyFriends>
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Flexible(
-                                child: Text(
-                                  snapshot.data![index]['data'].name,
-                                  //"Arindam Karmakar",
-                                  textScaleFactor: 1.5,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(color: Colors.white),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        snapshot.data![index]['data'].name,
+                                        //"Arindam Karmakar",
+                                        textScaleFactor: 1.5,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5.0),
+                                    if (snapshot.data![index]['data'].isFav)
+                                      Flexible(
+                                        child: Icon(
+                                          Icons.star_rounded,
+                                          color: Colors.white.withOpacity(0.5),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                               Flexible(
@@ -458,11 +515,11 @@ class _MyFriendsState extends State<MyFriends>
                               Flexible(
                                 child: GestureDetector(
                                   onTap: () async {
-                                    Uri _url = Uri.parse(
+                                    Uri url = Uri.parse(
                                         'tel:${snapshot.data![index]['data'].phone}');
 
-                                    if (!await launchUrl(_url)) {
-                                      throw 'Could not launch $_url';
+                                    if (!await launchUrl(url)) {
+                                      throw 'Could not launch $url';
                                     }
                                   },
                                   child: Row(
@@ -495,11 +552,11 @@ class _MyFriendsState extends State<MyFriends>
                               Flexible(
                                 child: GestureDetector(
                                   onTap: () async {
-                                    Uri _url = Uri.parse(
+                                    Uri url = Uri.parse(
                                         'mailto:${snapshot.data![index]['data'].email}');
 
-                                    if (!await launchUrl(_url)) {
-                                      throw 'Could not launch $_url';
+                                    if (!await launchUrl(url)) {
+                                      throw 'Could not launch $url';
                                     }
                                   },
                                   child: Row(
